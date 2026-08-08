@@ -1,6 +1,12 @@
-Ako te profesor pita „šta je Eureka i zašto je tu?", odgovor svojim rečima:
+1)Ako te profesor pita „šta je Eureka i zašto je tu?", odgovor svojim rečima:
 
 Eureka je service discovery — registar u kome se svaki mikroservis prijavi kad se pokrene.
 Umesto da servisi hardkoduju IP adrese jedan drugog (što bi bio pakao pri promenama i skaliranju), 
 oni pitaju Eureku „gde je servis pod imenom X?". 
 To omogućava dinamičku promenu adresa, više instanci istog servisa i load balancing.
+
+
+2)Sitnica koju profesor može pitati: „Zašto @EnableDiscoveryClient, a ne @EnableEurekaClient?"
+— @EnableEurekaClient radi samo za Eureku, dok je @EnableDiscoveryClient generička i radi za bilo koji discovery servis (Eureka, Consul, Zookeeper). 
+Danas se preporučuje @EnableDiscoveryClient jer je fleksibilnija. 
+U praksi, kad imaš spring-cloud-starter-netflix-eureka-client u pom.xml, čak i bez ijedne anotacije Spring automatski aktivira discovery — ali je dobra praksa eksplicitno napisati anotaciju da je kod čitljiviji.
