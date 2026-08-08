@@ -1,0 +1,6 @@
+Ako te profesor pita „šta je Eureka i zašto je tu?", odgovor svojim rečima:
+
+Eureka je service discovery — registar u kome se svaki mikroservis prijavi kad se pokrene.
+Umesto da servisi hardkoduju IP adrese jedan drugog (što bi bio pakao pri promenama i skaliranju), 
+oni pitaju Eureku „gde je servis pod imenom X?". 
+To omogućava dinamičku promenu adresa, više instanci istog servisa i load balancing.

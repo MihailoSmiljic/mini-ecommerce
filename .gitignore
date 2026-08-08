@@ -1,0 +1,19 @@
+# Maven build output
+target/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# VS Code
+.vscode/
+
+# OS sitnice
+.DS_Store
+Thumbs.db
+
+# Log fajlovi
+*.log
+
+# H2 baza (in-memory, ne treba je čuvati)
+*.db
