@@ -41,3 +41,5 @@ Rezime za odbranu (verovatna pitanja)
 Kad te profesor pita „zašto Actuator/Swagger na servisima a ne na Eureki":
 
 „Actuator i Swagger imaju smisla samo tamo gde postoji business logika koju treba pratiti ili dokumentovati. Eureka je infrastrukturna komponenta — ona je sama sebi kontrolni panel preko svog UI-ja. Dodavanje Actuator-a i Swagger-a joj bi bilo redundantno."
+
+„Swagger (springdoc-openapi) automatski generiše interaktivnu dokumentaciju REST API-ja iz Spring anotacija u kodu. Ima dve svrhe: prvo, drugi timovi (frontend, mobile) tačno vide šta API prima i vraća bez dodatnog dokumenta koji stari. Drugo, možemo direktno u browseru testirati endpoint-e klikom na 'Try it out' — brže nego preko Postman-a."

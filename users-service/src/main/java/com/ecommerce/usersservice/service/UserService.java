@@ -1,5 +1,6 @@
 package com.ecommerce.usersservice.service;
 
+import com.ecommerce.usersservice.exception.ResourceNotFoundException;
 import com.ecommerce.usersservice.model.User;
 import com.ecommerce.usersservice.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -24,7 +25,7 @@ public class UserService {
     // Vrati korisnika po ID-ju, ili baci grešku ako ne postoji
     public User findById(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Korisnik sa ID " + id + " nije pronađen"));
+                .orElseThrow(() -> new ResourceNotFoundException("Korisnik sa ID " + id + " nije pronađen"));
     }
 
     // Kreiraj novog korisnika
@@ -45,7 +46,7 @@ public class UserService {
     // Obriši korisnika po ID-ju
     public void delete(Long id) {
         if (!userRepository.existsById(id)) {
-            throw new RuntimeException("Korisnik sa ID " + id + " nije pronađen");
+            throw new ResourceNotFoundException("Korisnik sa ID " + id + " nije pronađen");
         }
         userRepository.deleteById(id);
     }

@@ -12,10 +12,10 @@
 	</parent>
 
 	<groupId>com.ecommerce</groupId>
-	<artifactId>users-service</artifactId>
+	<artifactId>products-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>users-service</name>
-	<description>Servis za upravljanje korisnicima u mini e-commerce sistemu</description>
+	<name>products-service</name>
+	<description>Servis za upravljanje proizvodima u mini e-commerce sistemu</description>
 
 	<properties>
 		<java.version>21</java.version>
