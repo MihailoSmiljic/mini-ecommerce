@@ -10,3 +10,34 @@ To omogućava dinamičku promenu adresa, više instanci istog servisa i load bal
 — @EnableEurekaClient radi samo za Eureku, dok je @EnableDiscoveryClient generička i radi za bilo koji discovery servis (Eureka, Consul, Zookeeper). 
 Danas se preporučuje @EnableDiscoveryClient jer je fleksibilnija. 
 U praksi, kad imaš spring-cloud-starter-netflix-eureka-client u pom.xml, čak i bez ijedne anotacije Spring automatski aktivira discovery — ali je dobra praksa eksplicitno napisati anotaciju da je kod čitljiviji.
+
+Za odbranu, ključno pitanje profesora:
+„Kako si implementirao validaciju?" → „Preko Bean Validation anotacija na Entity klasi (@NotBlank, @Email, @Size). Anotacije stoje na poljima, a @Valid u Controller-u aktivira 
+proveru. Ako podatak nije validan, Spring automatski vraća 400 sa objašnjenjem."
+
+Za odbranu, kratka verzija:
+
+„JPA je Java standard za perzistenciju objekata u bazi kroz anotacije. Hibernate je najpopularnija implementacija tog standarda — on stvarno radi posao: prevodi Java pozive
+u SQL, mapira objekte u tabele i obrnuto, upravlja konekcijama i transakcijama. U mom projektu koristim Spring Data JPA, koji je apstrakcija iznad JPA-a — daje mi Repository interfejse gde ne pišem ni implementaciju ni SQL."
+
+Rezime za odbranu (verovatna pitanja)
+
+„Šta je JPA, a šta Hibernate?"
+
+„JPA je Java standard za rad sa relacionim bazama kroz anotacije. Hibernate je najpopularnija implementacija tog standarda — on stvarno prevodi Java pozive u SQL i priča sa bazom. Ja koristim Spring Data JPA, koji je apstrakcija iznad JPA-a i daje mi Repository interfejse gde ne pišem ni SQL ni implementaciju."
+
+„Zašto koristiš JPA umesto pisanja SQL-a direktno?"
+
+„JPA mi omogućava da mislim u Java objektima umesto u tabelama. Isti kod radi sa različitim bazama — H2 sada, MySQL kasnije, samo se menja konfiguracija. Hibernate automatski generiše SQL, upravlja konekcijama, transakcijama, i mapira rezultate nazad u objekte. Manje koda, manje grešaka, lakše održavanje."
+
+„Šta radi ddl-auto: update?"
+
+„Pri pokretanju servisa, Hibernate uporedi Entity klase sa tabelama u bazi. Ako tabela ne postoji, napravi je; ako postoji ali fali kolona, dodaje kolonu. Ništa ne briše. Idealno za razvoj, u produkciji bih koristio validate ili none uz alat za migracije."
+
+„Zašto in-memory baza?"
+
+„Za razvoj projekta jednostavno — ne treba instalirati MySQL/PostgreSQL. Svaki restart daje čistu bazu za testiranje. U produkciji bih koristio pravu bazu."
+
+Kad te profesor pita „zašto Actuator/Swagger na servisima a ne na Eureki":
+
+„Actuator i Swagger imaju smisla samo tamo gde postoji business logika koju treba pratiti ili dokumentovati. Eureka je infrastrukturna komponenta — ona je sama sebi kontrolni panel preko svog UI-ja. Dodavanje Actuator-a i Swagger-a joj bi bilo redundantno."
