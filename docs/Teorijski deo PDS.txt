@@ -43,3 +43,10 @@ Kad te profesor pita „zašto Actuator/Swagger na servisima a ne na Eureki":
 „Actuator i Swagger imaju smisla samo tamo gde postoji business logika koju treba pratiti ili dokumentovati. Eureka je infrastrukturna komponenta — ona je sama sebi kontrolni panel preko svog UI-ja. Dodavanje Actuator-a i Swagger-a joj bi bilo redundantno."
 
 „Swagger (springdoc-openapi) automatski generiše interaktivnu dokumentaciju REST API-ja iz Spring anotacija u kodu. Ima dve svrhe: prvo, drugi timovi (frontend, mobile) tačno vide šta API prima i vraća bez dodatnog dokumenta koji stari. Drugo, možemo direktno u browseru testirati endpoint-e klikom na 'Try it out' — brže nego preko Postman-a."
+
+@RestControllerAdvice — Spring anotacija koja kaže „ova klasa presreće izuzetke iz svih @RestController-a i pretvara ih u JSON odgovore". Nema Controllera koji je „vlasnik" — deluje globalno, kroz ceo servis.
+@ExceptionHandler(NekiTip.class) — metoda hvata izuzetke tog tipa. Spring proverava tipove od najspecifičnijeg ka najopštijem: prvo ResourceNotFoundException, pa MethodArgumentNotValidException, pa (ako ništa nije upalilo) Exception (bilo šta).
+MethodArgumentNotValidException — Spring automatski baca ovaj izuzetak kad @Valid u Controller-u otkrije da polje nije validno. Naš handler ga hvata i vraća lepu poruku sa listom svih grešaka, ne samo prve.
+Kad te profesor pita „kako ti servis obraduje greške", tvoj odgovor:
+
+„Imam globalni exception handler kroz @RestControllerAdvice koji hvata izuzetke iz svih Controller-a. Custom ResourceNotFoundException mapiram u 404 sa jasnom porukom. Validacione greške (@Valid failures) hvatam kao MethodArgumentNotValidException i vraćam 400 sa mapom svih polja koja nisu prošla. Sve ostale greške završe kao 500. Time API vraća semantično tačne HTTP kodove i strukturisano JSON telo greške."
