@@ -1,10 +1,22 @@
 services:
 
+  config-server:
+    build: ./config-server
+    container_name: config-server
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./config-repo:/config-repo
+    networks:
+      - ecommerce-net
+
   eureka-server:
     build: ./eureka-server
     container_name: eureka-server
     ports:
       - "8761:8761"
+    depends_on:
+      - config-server
     networks:
       - ecommerce-net
 
@@ -15,7 +27,9 @@ services:
       - "8081:8081"
     environment:
       - EUREKA_URL=http://eureka-server:8761/eureka/
+      - CONFIG_SERVER_URL=http://config-server:8888
     depends_on:
+      - config-server
       - eureka-server
     networks:
       - ecommerce-net
@@ -27,7 +41,9 @@ services:
       - "8082:8082"
     environment:
       - EUREKA_URL=http://eureka-server:8761/eureka/
+      - CONFIG_SERVER_URL=http://config-server:8888
     depends_on:
+      - config-server
       - eureka-server
     networks:
       - ecommerce-net
@@ -39,7 +55,9 @@ services:
       - "8083:8083"
     environment:
       - EUREKA_URL=http://eureka-server:8761/eureka/
+      - CONFIG_SERVER_URL=http://config-server:8888
     depends_on:
+      - config-server
       - eureka-server
       - users-service
       - products-service
@@ -53,7 +71,9 @@ services:
       - "8080:8080"
     environment:
       - EUREKA_URL=http://eureka-server:8761/eureka/
+      - CONFIG_SERVER_URL=http://config-server:8888
     depends_on:
+      - config-server
       - eureka-server
     networks:
       - ecommerce-net
