@@ -1,10 +1,10 @@
-package eureka_server;
+package com.ecommerce.usersservice;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class EurekaServerApplicationTests {
+class UsersServiceApplicationTests {
 
 	@Test
 	void contextLoads() {
