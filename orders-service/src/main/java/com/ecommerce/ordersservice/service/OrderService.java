@@ -1,7 +1,6 @@
 package com.ecommerce.ordersservice.service;
 
-import com.ecommerce.ordersservice.client.ProductsFeignClient;
-import com.ecommerce.ordersservice.client.UsersFeignClient;
+import com.ecommerce.ordersservice.dto.OrderDetailsDto;
 import com.ecommerce.ordersservice.dto.ProductDto;
 import com.ecommerce.ordersservice.dto.UserDto;
 import com.ecommerce.ordersservice.exception.ResourceNotFoundException;
@@ -9,7 +8,7 @@ import com.ecommerce.ordersservice.model.Order;
 import com.ecommerce.ordersservice.model.OrderStatus;
 import com.ecommerce.ordersservice.repository.OrderRepository;
 import org.springframework.stereotype.Service;
-import com.ecommerce.ordersservice.dto.OrderDetailsDto;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,19 +17,13 @@ import java.util.List;
 public class OrderService {
 
     private final OrderRepository orderRepository;
-    private final UsersFeignClient usersFeignClient;
-    private final ProductsFeignClient productsFeignClient;
+    private final ResilientClientService clientService;
 
-    // Konstruktor — Spring ubacuje sve tri zavisnosti
     public OrderService(OrderRepository orderRepository,
-                        UsersFeignClient usersFeignClient,
-                        ProductsFeignClient productsFeignClient) {
+                        ResilientClientService clientService) {
         this.orderRepository = orderRepository;
-        this.usersFeignClient = usersFeignClient;
-        this.productsFeignClient = productsFeignClient;
+        this.clientService = clientService;
     }
-
-    // ============ CRUD metode ============
 
     public List<Order> findAll() {
         return orderRepository.findAll();
@@ -46,11 +39,11 @@ public class OrderService {
     }
 
     public Order create(Order order) {
-        // 1. Proveri da korisnik postoji (Feign poziv ka users-service)
-        UserDto user = usersFeignClient.getUserById(order.getUserId());
+        // 1. Proveri da korisnik postoji (kroz ResilientClientService)
+        UserDto user = clientService.fetchUser(order.getUserId());
 
-        // 2. Proveri da proizvod postoji i uzmi mu cenu (Feign poziv ka products-service)
-        ProductDto product = productsFeignClient.getProductById(order.getProductId());
+        // 2. Proveri da proizvod postoji i uzmi mu cenu
+        ProductDto product = clientService.fetchProduct(order.getProductId());
 
         // 3. Proveri da li ima dovoljno na stanju
         if (product.getStockQuantity() < order.getQuantity()) {
@@ -58,7 +51,7 @@ public class OrderService {
                     + ", traženo: " + order.getQuantity());
         }
 
-        // 4. Snimi cenu iz product-a (snapshot!) i izračunaj totalPrice
+        // 4. Snimi cenu kao snapshot i izračunaj total
         order.setPricePerUnit(product.getPrice());
         order.setTotalPrice(product.getPrice().multiply(BigDecimal.valueOf(order.getQuantity())));
 
@@ -82,18 +75,11 @@ public class OrderService {
         orderRepository.deleteById(id);
     }
 
-    // ============ Agregaciona metoda ============
+
     public OrderDetailsDto getOrderDetails(Long id) {
-        // 1. Uzmi porudžbinu iz svoje baze
         Order order = findById(id);
-
-        // 2. Feign poziv → users-service da uzmemo detalje kupca
-        UserDto user = usersFeignClient.getUserById(order.getUserId());
-
-        // 3. Feign poziv → products-service da uzmemo detalje proizvoda
-        ProductDto product = productsFeignClient.getProductById(order.getProductId());
-
-        // 4. Spakuj sve u jedan bogati DTO
+        UserDto user = clientService.fetchUser(order.getUserId());
+        ProductDto product = clientService.fetchProduct(order.getProductId());
         return new OrderDetailsDto(order, user, product);
     }
 }
