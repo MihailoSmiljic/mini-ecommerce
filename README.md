@@ -272,7 +272,7 @@ POST http://localhost:8080/api/orders
 ### 4. Agregacioni endpoint 
 
 Ovo je **srce projekta** — jedan poziv koji spaja podatke iz 3 servisa:
-GET http://localhost:8080/api/orders/1/details
+GET http://localhost:8083/api/orders/1/details
 
 Vraća porudžbinu + pun objekat korisnika + pun objekat proizvoda:
 
