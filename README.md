@@ -74,8 +74,10 @@ Svih 7 container-a pokrenutih iz jedne komande `docker-compose up`:
 - **Spring Cloud Config Server** (native profile, čita iz `config-repo/`)
 - **Docker Compose** (orkestracija svih container-a sa healthcheck-ovima)
 
-### Dodatno
+### Dodatno (bonusi)
 - **Globalni exception handling** (`@RestControllerAdvice`)
+- **Load balancing** — dve instance products-service-a sa round-robin raspoređivanjem
+- **Multi-environment profili** (dev/test/prod)
 - **Healthcheck-ovi u Docker Compose** (pravilan redosled pokretanja bez race condition-a)
 - **Snapshot pattern** za cenu u porudžbini
 
@@ -379,6 +381,40 @@ Umesto samo `depends_on`, koristim healthcheck-ove sa `condition: service_health
 
 ### 7. Load balanced routing kroz Gateway
 Gateway koristi `lb://SERVICE-NAME` prefiks umesto direktne URL adrese. Time se dobija automatski load balancing između instanci servisa (round-robin) preko Spring Cloud LoadBalancer-a.
+
+---
+
+## Dodatni bonusi
+
+Pored obaveznih i opcionih tehnologija, sistem implementira i sledeće bonuse.
+
+### Load balancing (više instanci servisa)
+
+Sistem pokreće **dve instance** products-service-a (`products-service` i `products-service-2`), obe registrovane pod istim imenom `PRODUCTS-SERVICE` u Eureki. Spring Cloud LoadBalancer automatski raspoređuje zahteve između njih koristeći round-robin strategiju — bez ikakve promene u kodu, samo dodavanjem nove instance u `docker-compose.yml`.
+
+![Dve instance u Eureki](docs/screenshots/eureka-2-instances.png)
+
+Kada se pošalje više zahteva na `/api/products`, oni se naizmenično raspoređuju između obe instance. Ovo se jasno vidi u logovima — jedna instanca obrađuje jedan zahtev (npr. INSERT), druga sledeći (npr. SELECT):
+
+![Load balancing u logovima](docs/screenshots/load-balancing-logs.png)
+
+**Napomena:** Svaka instanca ima svoju H2 in-memory bazu, pa podaci uneti u jednu nisu vidljivi u drugoj. Ovo demonstrira zašto se u produkciji sve instance istog servisa povezuju na **zajedničku bazu** (PostgreSQL/MySQL) umesto in-memory H2.
+
+### Multi-environment profili
+
+Users-service podržava tri profila konfiguracije: **dev**, **test** i **prod**. Svaki profil ima različite postavke koje se čuvaju u Config Server-u (`config-repo/users-service-{profil}.yml`). Profil se aktivira kroz `SPRING_PROFILES_ACTIVE` environment varijablu u `docker-compose.yml`.
+
+![Dev profil](docs/screenshots/config-dev-profile.png)
+
+| Profil | Logovanje | H2 konzola | SQL prikaz |
+|--------|-----------|------------|------------|
+| **dev** | DEBUG (detaljno) | uključena | da |
+| **test** | INFO (umereno) | uključena | ne |
+| **prod** | WARN (minimalno) | isključena | ne |
+
+Ista aplikacija se ponaša drugačije zavisno od okruženja — u razvoju su detaljni logovi i H2 konzola dostupni, dok su u produkciji isključeni iz sigurnosnih i performansnih razloga.
+
+---
 
 ---
 
