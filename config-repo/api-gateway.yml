@@ -20,7 +20,10 @@ spring:
               uri: lb://PRODUCTS-SERVICE
               predicates:
                 - Path=/api/products/**
-
+            - id: notifications-service-route
+              uri: lb://NOTIFICATIONS-SERVICE
+              predicates:
+                - Path=/api/notifications/**
             - id: orders-service-route
               uri: lb://ORDERS-SERVICE
               predicates:

@@ -7,6 +7,8 @@ import com.ecommerce.ordersservice.dto.UserDto;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import org.springframework.stereotype.Service;
+import com.ecommerce.ordersservice.client.NotificationsFeignClient;
+import com.ecommerce.ordersservice.dto.NotificationDto;
 
 import java.math.BigDecimal;
 
@@ -15,11 +17,14 @@ public class ResilientClientService {
 
     private final UsersFeignClient usersFeignClient;
     private final ProductsFeignClient productsFeignClient;
+    private final NotificationsFeignClient notificationsFeignClient;
 
     public ResilientClientService(UsersFeignClient usersFeignClient,
-                                  ProductsFeignClient productsFeignClient) {
+                                  ProductsFeignClient productsFeignClient,
+                                  NotificationsFeignClient notificationsFeignClient) {
         this.usersFeignClient = usersFeignClient;
         this.productsFeignClient = productsFeignClient;
+        this.notificationsFeignClient = notificationsFeignClient;
     }
 
 
@@ -55,5 +60,20 @@ public class ResilientClientService {
         fallback.setPrice(BigDecimal.ZERO);
         fallback.setStockQuantity(0);
         return fallback;
+    }
+
+
+
+    @CircuitBreaker(name = "notificationsService", fallbackMethod = "notificationsServiceFallback")
+    @Retry(name = "notificationsService")
+    public NotificationDto sendNotification(NotificationDto notification) {
+        return notificationsFeignClient.createNotification(notification);
+    }
+
+    public NotificationDto notificationsServiceFallback(NotificationDto notification, Throwable ex) {
+        // Ako notifications-service ne radi, samo logujemo — porudžbina se ipak pravi
+        System.err.println("⚠️ Notifikacija nije poslata (notifications-service ne odgovara): "
+                + notification.getMessage());
+        return notification; // vraća isti objekat, samo da nešto vrati
     }
 }

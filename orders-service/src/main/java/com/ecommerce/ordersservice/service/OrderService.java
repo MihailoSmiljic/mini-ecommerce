@@ -8,7 +8,7 @@ import com.ecommerce.ordersservice.model.Order;
 import com.ecommerce.ordersservice.model.OrderStatus;
 import com.ecommerce.ordersservice.repository.OrderRepository;
 import org.springframework.stereotype.Service;
-
+import com.ecommerce.ordersservice.dto.NotificationDto;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -59,7 +59,22 @@ public class OrderService {
         order.setStatus(OrderStatus.PENDING);
         order.setCreatedAt(LocalDateTime.now());
 
-        return orderRepository.save(order);
+        Order saved = orderRepository.save(order);
+
+        String poruka = String.format(
+                "Uspešno napravljena porudžbina #%d za %s %s. Proizvod: %s, količina: %d, ukupno: %s RSD",
+                saved.getId(),
+                user.getFirstName(),
+                user.getLastName(),
+                product.getName(),
+                saved.getQuantity(),
+                saved.getTotalPrice()
+        );
+
+        NotificationDto notif = new NotificationDto(user.getId(), saved.getId(), poruka);
+        clientService.sendNotification(notif);
+
+        return saved;
     }
 
     public Order updateStatus(Long id, OrderStatus newStatus) {
