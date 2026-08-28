@@ -1,0 +1,14 @@
+spring:
+  jpa:
+    show-sql: true
+  h2:
+    console:
+      enabled: true
+
+logging:
+  level:
+    com.ecommerce: DEBUG
+    org.springframework.web: DEBUG
+
+info:
+  environment: "DEVELOPMENT - detaljni logovi, H2 konzola uključena"

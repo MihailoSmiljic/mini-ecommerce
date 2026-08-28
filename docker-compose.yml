@@ -41,6 +41,7 @@ services:
     environment:
       - EUREKA_URL=http://eureka-server:8761/eureka/
       - CONFIG_SERVER_URL=http://config-server:8888
+      - SPRING_PROFILES_ACTIVE=dev
     depends_on:
       config-server:
         condition: service_healthy
@@ -150,6 +151,27 @@ services:
         condition: service_healthy
     networks:
       - ecommerce-net
+  products-service-2:
+    build: ./products-service
+    container_name: products-service-2
+    ports:
+      - "8092:8082"
+    environment:
+      - EUREKA_URL=http://eureka-server:8761/eureka/
+      - CONFIG_SERVER_URL=http://config-server:8888
+    depends_on:
+      config-server:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - ecommerce-net
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:8082/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
 
 networks:
   ecommerce-net:

@@ -1,0 +1,13 @@
+spring:
+  jpa:
+    show-sql: false
+  h2:
+    console:
+      enabled: true
+
+logging:
+  level:
+    com.ecommerce: INFO
+
+info:
+  environment: "TEST - umeren nivo logovanja"
