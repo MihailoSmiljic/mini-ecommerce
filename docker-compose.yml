@@ -48,6 +48,12 @@ services:
         condition: service_healthy
     networks:
       - ecommerce-net
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8081/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
 
   products-service:
     build: ./products-service
@@ -64,6 +70,13 @@ services:
         condition: service_healthy
     networks:
       - ecommerce-net
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8082/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+
   notifications-service:
     build: ./notifications-service
     container_name: notifications-service
@@ -79,6 +92,13 @@ services:
         condition: service_healthy
     networks:
       - ecommerce-net
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8084/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+
   orders-service:
     build: ./orders-service
     container_name: orders-service
@@ -93,11 +113,19 @@ services:
       eureka-server:
         condition: service_healthy
       users-service:
-        condition: service_started
+        condition: service_healthy
       products-service:
-        condition: service_started
+        condition: service_healthy
+      notifications-service:
+        condition: service_healthy
     networks:
       - ecommerce-net
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8083/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
 
   api-gateway:
     build: ./api-gateway
@@ -111,6 +139,14 @@ services:
       config-server:
         condition: service_healthy
       eureka-server:
+        condition: service_healthy
+      users-service:
+        condition: service_healthy
+      products-service:
+        condition: service_healthy
+      orders-service:
+        condition: service_healthy
+      notifications-service:
         condition: service_healthy
     networks:
       - ecommerce-net
